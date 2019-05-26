@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Post | Open Open Source]]></title>
+  <link href="http://darthbeep.github.io/blog/categories/post/atom.xml" rel="self"/>
+  <link href="http://darthbeep.github.io/"/>
+  <updated>2019-05-25T20:19:53-04:00</updated>
+  <id>http://darthbeep.github.io/</id>
+  <author>
+    <name><![CDATA[Shaina Peters]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[My First Post]]></title>
+    <link href="http://darthbeep.github.io/blog/2019/05/25/my-first-post/"/>
+    <updated>2019-05-25T19:54:53-04:00</updated>
+    <id>http://darthbeep.github.io/blog/2019/05/25/my-first-post</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m testing a post.</p>
+
+<p>Testity testity test.</p>
+]]></content>
+  </entry>
+  
+</feed>
