@@ -12,7 +12,7 @@ Compared to other operating systems, the gesture support in Linux is known to be
 No matter where you go to do your gestures, you’ll encounter the same command before you start:
 
 {% codeblock lang:bash %}
-$sudo gpasswd -a $USER input
+$ sudo gpasswd -a $USER input
 {% endcodeblock %}
 
 To understand this command, first, you need to understand groups. Though they are commonly come across, they don’t get much attention. If you `chmod` a file to 764, you’re saying that the group is given permissions associated with 6 (reading and writing). The middle 3 characters when you use `$ ls -l` say the permissions the file’s group has when modifying it. Every file has not just a user who can access it, but a group. While said group is often just the user, that’s not always the case. In this case, we’re dealing with a series of files that can only be accessed by the group input.
