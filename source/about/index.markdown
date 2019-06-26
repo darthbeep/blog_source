@@ -6,4 +6,4 @@ comments: false
 sharing: false
 footer: false
 ---
-Hi, I'm Shaina, and I'm making a blog to reading and detailing the code of various open source projects.
+Hi, I'm Shaina, and I'm making a blog for reading and detailing the code of various open source projects.

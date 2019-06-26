@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Open Open Source]]></title>
+  <title><![CDATA[Opening Open Source]]></title>
   <link href="http://darthbeep.github.io/atom.xml" rel="self"/>
   <link href="http://darthbeep.github.io/"/>
-  <updated>2019-06-23T01:06:14-04:00</updated>
+  <updated>2019-06-26T15:29:13-04:00</updated>
   <id>http://darthbeep.github.io/</id>
   <author>
     <name><![CDATA[Shaina Peters]]></name>
@@ -18,7 +18,9 @@
     <link href="http://darthbeep.github.io/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/"/>
     <updated>2019-06-22T23:52:26-04:00</updated>
     <id>http://darthbeep.github.io/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install</id>
-    <content type="html"><![CDATA[<p>Compared to other operating systems, the gesture support in Linux is known to be lacking. There are multiple ways to fix this, with varying degrees of complexity, but the one I am going to be talking about is <a href="https://github.com/bulletmark/libinput-gestures" title="libinput-gestures">libinput gestures</a>. Though the tutorial in the repo&rsquo;s readme will tell you how to install gestures, it wont tell you what goes on behind the scenes. The goal of this blog  is twofold. Firstly, the goal is to explain how gestures work, going into the code to tell you everything that happens. But the goal is also to look at code in various parts of a repo and explain them in depth, so that everything can be understood and learned from. This entry won&rsquo;t go into the actual gesture code, what happens before you type <code>$ make install</code>.</p>
+    <content type="html"><![CDATA[<p>I&rsquo;m probably one of the only Linux users who really like gestures. Going back a web page and switching desktops with a swipe of my fingers is really easy and convenient. But when I switched to Linux, I found the support rediculously lacking. It took a week of searching and trial and error to finally figure out how to implemnet gestures, at which point I stumbled upon <a href="https://github.com/bulletmark/libinput-gestures" title="libinput-gestures">libinput gestures</a>, which finally did solve my problem. Now that I have a solution (and a fair amount of time has passed) I want to work on a project: documenting open source. But not just going over the functions, but going extremely in depth and looking at EVERYTHING that happens.</p>
+
+<p>This guide won&rsquo;t just show off what happens to make gestures work, but will talk about everything along the way. While the actual code is written in python, this part will only focus on bash and make. For an in depth analysis of the code, look for later parts. Because this code is based on the libinput-gestures code, you should familiarise yourself with the README and Makefile before or during your reading. Now let&rsquo;s get started.</p>
 
 <p>No matter where you go to do your gestures, you’ll encounter the same command before you start:</p>
 
@@ -27,7 +29,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>To understand this command, first, you need to understand groups. Though they are commonly come across, they don’t get much attention. If you <code>chmod</code> a file to 764, you’re saying that the group is given permissions associated with 6 (reading and writing). The middle 3 characters when you use <code>$ ls -l</code> say the permissions the file’s group has when modifying it. Every file has not just a user who can access it, but a group. While said group is often just the user, that’s not always the case. In this case, we’re dealing with a series of files that can only be accessed by the group input.</p>
+<p>To understand this command, first you need to understand groups. Though they are commonly come across, they don’t get much attention. If you <code>chmod</code> a file to 764, you’re saying that the group is given permissions associated with 6 (reading and writing). The middle 3 characters when you use <code>$ ls -l</code> say the permissions the file’s group has when modifying it. Every file has not just a user who can access it, but a group. While said group is often just the user, that’s not always the case. In this case, we’re dealing with a series of files that can only be accessed by the group input.</p>
 
 <p>The command gpasswd is used when administrating groups. The argument <code>-a</code> adds a user to a group. So <code>$ gpasswd -a $USER input</code> adds <code>$USER</code> (which is your username) to the group input. This is important because the group input has access to the files <code>/dev/input/event*</code> (as well as <code>/dev/input/mouse*</code>, though this is less important for gestures). So what is the point of this?</p>
 
@@ -73,7 +75,7 @@
 
 <p>This is pretty standard make. The interesting part comes with the make code. The first line  just does exactly what it says, running the command <code>$ flake8 libinput-gestures</code>. <code>flake8</code> is a command that tests for proper conventions in python code. This check fails, as line 533 is longer than 80 characters. I don&rsquo;t know why the developers included a check if they don&rsquo;t intend to use it themselves, but if anyone is looking for an easy pull request, they can have one. The second line is similar in that it checks shell scripts for errors and bad code, though it differs in that the code passes the check. It also includes an argument <code>-e</code> which tells it to exclude the errors corresponding to the codes listed after it. In short, the allowed forms of bad code are redundant logic, double double quotation marks, not double quoting expanding variables, using <code>\n</code> rather than <code>\\n</code>, using read without <code>-r</code>, running then checking exit status in two steps, unused variables, not using a directive to specify the location of a source file with a variable location, and not checking to make sure a path variable isn&rsquo;t empty. The conclusion that can be drawn from this is shellcheck has a lot of different types of errors. I&rsquo;m not sure if this is intentional or laziness, though there are a lot of fixable errors if shellcheck is run to allow these errors (though some do seem justified in the code).</p>
 
-<p>So which shellcheck errors are justified? And what happens after you actually type make install? How does libinput gestures actually work? Find out next time on the next post of my blog.</p>
+<p>So which shellcheck errors are justified? And what happens after you actually type make install? How does libinput gestures actually work? Find out next time on my blog.</p>
 ]]></content>
   </entry>
   
