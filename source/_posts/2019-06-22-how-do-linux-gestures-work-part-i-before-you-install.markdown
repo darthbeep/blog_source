@@ -3,7 +3,7 @@ layout: post
 title: "How Do Linux Gestures Work? Part I: Before You Install"
 date: 2019-06-22 23:52:26 -0400
 comments: true
-categories: [libinput-gestures, gestures, markdown, groups]
+categories: [libinput-gestures, gestures, bash, linux, make, groups]
 ---
 I'm probably one of the only Linux users who really like gestures. Going back a web page and switching desktops with a swipe of my fingers is really easy and convenient. But when I switched to Linux, I found the support rediculously lacking. It took a week of searching and trial and error to finally figure out how to implemnet gestures, at which point I stumbled upon [libinput gestures][2b6bf2e2], which finally did solve my problem. Now that I have a solution (and a fair amount of time has passed) I want to work on a project: documenting open source. But not just going over the functions, but going extremely in depth and looking at EVERYTHING that happens.
 
