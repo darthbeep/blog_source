@@ -9,7 +9,7 @@
   <meta name="author" content="Shaina Peters">
 
   
-  <meta name="description" content="Tweet How Do Linux Gestures Work? Part I: Before You Install Jun 22nd, 2019 11:52 pm gestures, groups, libinput-gestures, markdown I&rsquo;m &hellip;">
+  <meta name="description" content="Tweet How I Linked My 3DS as My Controller on Linux Jun 30th, 2019 7:45 pm 3ds, bash, gaming, linux Early one morning my friend Jake texted me about &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -110,6 +110,202 @@
     
       <h2 class="entry-title">
         
+        <a href="/blog/2019/06/30/how-i-linked-my-3ds-as-my-controller-on-linux/">How I Linked My 3DS as My Controller on Linux</a>
+        
+      </h2>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-06-30T19:45:46-04:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>7:45 pm</span></time>
+		
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/3ds/'>3ds</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/gaming/'>gaming</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+        
+      </p>
+    
+  </header>
+
+
+  <p>Early one morning my friend Jake texted me about playing Stardew Valley that night. I immidietly agreed, but was soon faced with a problem: my desk was currently full, leaving me unable to use my mouse. I don&rsquo;t usually work at my desk or use my mouse, as I favor the trackpad, but Stardew Valley is very hard to play without one. So I looked at my options. Finding a place to use a mouse was sub optimal, as was using the trackpad, but there was one thing I could do: using a controller. Which led to one more problem: the only controller I actually had was a 3DS. Well, not to worry, right? I&rsquo;d used the 3DS as a console to play Smash before, and I&rsquo;d heard rumors about the 3DS as a controller on Linux. So, I imminently got to work, setting up my 3DS as a controller for my computer.</p>
+
+<p>A few software notes: My <a href="https://3ds.hacks.guide/">3DS is homebrewed</a>. I don&rsquo;t know if this is a requirement. But I do know it makes owning a 3DS a lot more fun. I originally did all of this on my computer, which runs Arch, but when writing this shortly after the fact, I tested it on Debian, both to ensure that I wasn&rsquo;t forgetting anything and to make sure this guide wasn&rsquo;t Arch only.</p>
+
+<p>After a bit of googling, I decided on <a href="https://github.com/phijor/ctroller">this repository</a>, called ctroller. There was one other, but this had the prettiest readme.  One thing to keep in mind about the repository is that it has two parts. One for the Linux side, which has a server that interprets data sent from the 3DS into a device on the system, and the 3DS side, which builds a 3DS application the 3DS uses to send the data. Well, now that I had a repo, it was time to build all the things.</p>
+
+<p>First, on to the Linux side of things. The repository tells you to install the AUR package <code>ctroller-git</code>, which couldn&rsquo;t be installed, or <code>ctroller-bin</code>, which could. Then I just typed in make install and it worked perfectly. That was easy. Going off of this it should be smooth sailing for the rest of the setup, right?</p>
+
+<p>The next step is to get the 3DS files on your 3DS. You can either download them or make them yourself. Personally, I only use locally-sourced, grass-fed, vaccine-free binaries. So obviously I was going to build them myself. So I followed the instructions and went into the 3DS folder.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>make release
+</span><span class='line'>Makefile:6: *** <span class="s2">&quot;Please set DEVKITARM in your environment. export DEVKITARM=&lt;path to&gt;devkitARM&quot;</span>.  Stop.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alright, let&rsquo;s go up to the part in the repository where it tells us about DevkitARM. Wait&ndash; why doesn&rsquo;t this link have any file?</p>
+
+<p>So a bit of googling got me <a href="https://devkitpro.org/wiki/devkitPro_pacman">here</a>. And because entering random commands is what I do to keep life exciting, I entered the following into my computer (the page contains information for multiple operating systems, but I followed the instructions for Arch). For a more in depth explanation of what happened, follow the link. The next 3 code blocks are for Arch, but I&rsquo;ll get to other distributions in a second.</p>
+
+<figure class='code'><figcaption><span>Arch instructions </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ DEVKITPRO</span><span class="o">=</span>/opt/devkitpro
+</span><span class='line'><span class="nv">$ DEVKITARM</span><span class="o">=</span>/opt/devkitpro/devkitARM
+</span><span class='line'><span class="nv">$ DEVKITPPC</span><span class="o">=</span>/opt/devkitpro/devkitPPC
+</span><span class='line'><span class="nv">$ </span>sudo pacman-key --recv F7FD5492264BB9D0
+</span><span class='line'><span class="nv">$ </span>sudo pacman-key --lsign F7FD5492264BB9D0sudo pacman -U https://downloads.devkitpro.org/devkitpro-<span class="nv">$ </span>keyring-r1.787e015-2-any.pkg.tar.xz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I added these lines to /etc/pacman.conf</p>
+
+<figure class='code'><figcaption><span>/etc/pacman.conf </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>dkp-libs<span class="o">]</span>
+</span><span class='line'><span class="nv">Server</span> <span class="o">=</span> https://downloads.devkitpro.org/packages
+</span><span class='line'><span class="o">[</span>dkp-linux<span class="o">]</span>
+</span><span class='line'><span class="nv">Server</span> <span class="o">=</span> https://downloads.devkitpro.org/packages/linux
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Followed by the commands</p>
+
+<figure class='code'><figcaption><span>Arch instructions </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>sudo pacman -Syu
+</span><span class='line'><span class="nv">$ </span>sudo pacman -S 3ds-dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Because this blog was written slightly after the fact, and to ensure accuracy was tested again on a Debian VM. Distributions based on neither Debian nor Arch should probably follow the instructions on linked page, but will look a lot like this. The first part downloads a .deb binary I found <a href="https://github.com/devkitPro/pacman/releases/tag/devkitpro-pacman-1.0.1">here</a>, but you can find instructions for other distributions <a href="https://devkitpro.org/wiki/devkitPro_pacman">on the main page</a>.</p>
+
+<figure class='code'><figcaption><span>Debian instructions </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb
+</span><span class='line'><span class="nv">$ </span>sudo dpkg -i devkitpro-pacman.deb
+</span><span class='line'><span class="nv">$ </span>sudo dkp-pacman -Syu
+</span><span class='line'><span class="nv">$ </span>sudo dkp-pacman -S 3ds-dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>No matter which path you choose, you&rsquo;ll need to enter the following afterwards.</p>
+
+<figure class='code'><figcaption><span>Any distribution </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span><span class="nb">export </span><span class="nv">DEVKITPRO</span><span class="o">=</span>/opt/devkitpro
+</span><span class='line'><span class="nv">$ </span><span class="nb">export </span><span class="nv">DEVKITARM</span><span class="o">=</span>/opt/devkitpro/devkitARM
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alright, we got one thing working. Now let&rsquo;s run make release again. And&hellip; seems like we&rsquo;re missing bannertool. Fortunately, this is one problem the AUR can fix. Less fortunately, it seems like for any other operating system, we&rsquo;re dealing with <a href="https://github.com/Steveice10/bannertool">a repository</a> with a vague makefile and no readme. Usually a makefile gives some clue as to how to run it, and this makefile certainly gave a clue: it got its pattern from a file in a subfolder.</p>
+
+<p>The only problem? That subfolder was the submodule for <a href="https://github.com/Steveice10/bannertool">a different Github repository</a>. The submodule didn&rsquo;t copy over when cloning, but fortunately you can able to manually fix it by deleting the buildtools folder and cloning the linked buildtools repo instead. Now I just had to type make, and at least I got an executable out of it, even if it was hidden in the <code>output/linux-x86_64/</code> folder. Here&rsquo;s the executed code, for reference.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone https://github.com/Steveice10/bannertool
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>bannertool/
+</span><span class='line'><span class="nv">$ </span>rm -rf buildtools/
+</span><span class='line'><span class="nv">$ </span>git clone https://github.com/Steveice10/buildtools
+</span><span class='line'><span class="nv">$ </span>make
+</span><span class='line'><span class="nv">$ </span>ls -F output/linux-x86_64/ <span class="c"># -F will give executables a *, among other things</span>
+</span><span class='line'>bannertool*
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So we&rsquo;ve got an executable. What to do with it? Well, nothing yet. My gift of foresight tells me that the executable will have a twin before we&rsquo;re done. And where do we find this twin? Well, the original repository says to have both <code>bannertool</code> and <code>makerom</code> in your <code>$PATH</code>. And we already have an executable for bannertool, so now we need one for makerom. Following the link for the repository, we end up <a href="https://github.com/profi200/Project_CTR/tree/master/makerom">here</a>.</p>
+
+<p>Anyone who clicks links before reading ahead will notice two things: first, that we aren&rsquo;t even in the head of a repository. We&rsquo;re in a subfolder of a repository with an entirely different goal. And second, the readme only links to a site which definitely does not contain installation information. We&rsquo;re back to running unidentified makefiles. At least this one gives less of a fight, all you have to do is clone the parent repository, <code>cd</code> into the <code>makerom</code> folder, and type <code>make</code>. And thus an executable is born. Reference code below.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git clone https://github.com/profi200/Project_CTR
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>makerom/
+</span><span class='line'><span class="nv">$ </span>make
+</span><span class='line'><span class="nv">$ </span>ls -F makerom <span class="c"># -F will give executables a *, among other things</span>
+</span><span class='line'>makerom*
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now we have the two executables we need. Now we just need to put them in our $PATH. There are probably a lot of ways to do this, but keep in mind when I had to get this done, I was doing it after a fair amount of figuring things out. I was tired. So this is what I did.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mkdir path
+</span><span class='line'><span class="nv">$ </span>cp bannertool/output/linux-x86_64/bannertool path
+</span><span class='line'><span class="nv">$ </span>cp Project_CTR/makerom/makerom path
+</span><span class='line'><span class="nv">$ </span><span class="nb">cd </span>path/
+</span><span class='line'><span class="nv">$ </span><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;$PATH:$(pwd)&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yeah.</p>
+
+<p>For those of you who can&rsquo;t or don&rsquo;t want to read what I just did, I essentially made a new folder, added the two gained executables to it, and then added it to my <code>$PATH</code> variable. This is probably not advised, but in my defense, it worked.</p>
+
+<p>Now, if we run make release again in the 3DS folder, it works. The 3DS files are generated. We can rest. Almost.</p>
+
+<p>Now, all you have to do is plug in your SD card into your computer. There is an upload script mentioned by the repository, but I didn&rsquo;t test it. Once the SD is in the computer, you need to create a directory called ctroller in your sd card&rsquo;s root directory, and then you should put ctroller.cfg in it. ctroller.cfg should contain your computer&rsquo;s IP address instead of the default. You should also put <code>ctroller.cia</code> on the SD (or install the actual program however you usually transfer programs onto your 3DS).</p>
+
+<p>Now, the hard part is over. Before you run the server on Linux, you need to run <code>$ modprobe uinput</code>, and  to run it you need to run the actual executable <code>ctroller</code> file, probably with <code>$ ./linux/ctroller</code>. Now that you have the server running on your computer, convert the cia to a program or install it like any other program and run it. Then make sure your computer and 3DS are on the same network. You&rsquo;re done! You can now use the 3DS as a controller for your computer!</p>
+
+<p>To review the controller, it normally works just fine. However, it does go through periods of lag, where commands pause for a little while and then execute all at once. I would not recommended using the controller for a game with any stakes, but it works fine for Stardew Valley. Except when your internet goes down for a minute (hi Spectrum). But it&rsquo;s worth it to say you&rsquo;re gaming with a 3DS as a controller.</p>
+
+  
+  
+
+
+    </article>
+  
+  
+    <article class="post">
+      <div class="sharing-box">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthbeep.github.io/index.html" data-via="" data-counturl="http://darthbeep.github.io/index.html" data-size="large">Tweet</a>
+  
+  
+  
+</div>
+
+      
+  <header>
+    
+      <h2 class="entry-title">
+        
         <a href="/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/">How Do Linux Gestures Work? Part I: Before You Install</a>
         
       </h2>
@@ -126,7 +322,7 @@
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/gestures/'>gestures</a>, <a class='category' href='/blog/categories/groups/'>groups</a>, <a class='category' href='/blog/categories/libinput-gestures/'>libinput-gestures</a>, <a class='category' href='/blog/categories/markdown/'>markdown</a>
+    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/gestures/'>gestures</a>, <a class='category' href='/blog/categories/groups/'>groups</a>, <a class='category' href='/blog/categories/libinput-gestures/'>libinput-gestures</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/make/'>make</a>
   
 </span>
 
