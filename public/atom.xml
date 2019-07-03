@@ -4,7 +4,7 @@
   <title><![CDATA[Opening Open Source]]></title>
   <link href="http://darthbeep.github.io/atom.xml" rel="self"/>
   <link href="http://darthbeep.github.io/"/>
-  <updated>2019-07-03T04:24:20-04:00</updated>
+  <updated>2019-07-03T04:26:02-04:00</updated>
   <id>http://darthbeep.github.io/</id>
   <author>
     <name><![CDATA[Shaina Peters]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Analyzing an Open Source Project: Part II -- Reading Installation Script Arguments]]></title>
-    <link href="http://darthbeep.github.io/blog/2019/07/03/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/"/>
-    <updated>2019-07-03T03:56:58-04:00</updated>
-    <id>http://darthbeep.github.io/blog/2019/07/03/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments</id>
+    <link href="http://darthbeep.github.io/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/"/>
+    <updated>2019-07-02T21:56:58-04:00</updated>
+    <id>http://darthbeep.github.io/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments</id>
     <content type="html"><![CDATA[<p>Here we begin Part II of Analyzing an Open Source Project. For Part I, which deals with setting up and looking at a makefile, <a href="http://darthbeep.github.io/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/">click here</a>. The open source project I&rsquo;m analyzing is <a href="https://github.com/bulletmark/libinput-gestures">libinput-gestures</a>, and this part begins looking at the setup script. <a href="https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup">Click here</a> for the code. To keep each article from getting too long, the setup script will require multiple articles. This part will focus on getting the program name and article parsing.</p>
 
 <p>Some things start off with a bang, but libinput-gestures-setup starts off with a shebang. So we know that the script is meant to be run in bash, but what else do we know? Well, just like us, the script starts by trying to learn more about itself.</p>

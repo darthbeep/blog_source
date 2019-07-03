@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Analyzing an Open Source Project: Part II -- Reading Installation Script Arguments"
-date: 2019-07-03 03:56:58 -0400
+date: 2019-07-02 21:56:58 -0400
 comments: true
 categories: [libinput-gestures, gestures, bash, linux, getopts]
 ---
