@@ -11,7 +11,7 @@ A few software notes: My [3DS is homebrewed](https://3ds.hacks.guide/). I don't 
 
 After a bit of googling, I decided on [this repository](https://github.com/phijor/ctroller), called ctroller. There was one other, but this had the prettiest readme.  One thing to keep in mind about the repository is that it has two parts. One for the Linux side, which has a server that interprets data sent from the 3DS into a device on the system, and the 3DS side, which builds a 3DS application the 3DS uses to send the data. Well, now that I had a repo, it was time to build all the things.
 
-First, on to the Linux side of things. The repository tells you to install the AUR package `ctroller-git`, which couldn't be installed, or `ctroller-bin`, which could. Then I just typed in make install and it worked perfectly. That was easy. Going off of this it should be smooth sailing for the rest of the setup, right?
+First, on to the Linux side of things. The repository tells you to install the AUR package `ctroller-git`, which couldn't be installed, or `ctroller-bin`, which could. Then I just typed in `make install` and it worked perfectly. That was easy. Going off of this it should be smooth sailing for the rest of the setup, right?
 
 The next step is to get the 3DS files on your 3DS. You can either download them or make them yourself. Personally, I only use locally-sourced, grass-fed, vaccine-free binaries. So obviously I was going to build them myself. So I followed the instructions and went into the 3DS folder.
 
