@@ -9,7 +9,7 @@
   <meta name="author" content="Shaina Peters">
 
   
-  <meta name="description" content="Tweet How I Linked My 3DS as My Controller on Linux Jun 30th, 2019 7:45 pm 3ds, bash, gaming, linux Early one morning my friend Jake texted me about &hellip;">
+  <meta name="description" content="Tweet Analyzing an Open Source Project: Part II -- Reading Installation Script Arguments Jul 3rd, 2019 3:56 am bash, gestures, getopts, libinput- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -110,6 +110,136 @@
     
       <h2 class="entry-title">
         
+        <a href="/blog/2019/07/03/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/">Analyzing an Open Source Project: Part II -- Reading Installation Script Arguments</a>
+        
+      </h2>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-07-03T03:56:58-04:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2019</span></span> <span class='time'>3:56 am</span></time>
+		
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/gestures/'>gestures</a>, <a class='category' href='/blog/categories/getopts/'>getopts</a>, <a class='category' href='/blog/categories/libinput-gestures/'>libinput-gestures</a>, <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+        
+      </p>
+    
+  </header>
+
+
+  <p>Here we begin Part II of Analyzing an Open Source Project. For Part I, which deals with setting up and looking at a makefile, <a href="/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/">click here</a>. The open source project I&rsquo;m analyzing is <a href="https://github.com/bulletmark/libinput-gestures">libinput-gestures</a>, and this part begins looking at the setup script. <a href="https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup">Click here</a> for the code. To keep each article from getting too long, the setup script will require multiple articles. This part will focus on getting the program name and article parsing.</p>
+
+<p>Some things start off with a bang, but libinput-gestures-setup starts off with a shebang. So we know that the script is meant to be run in bash, but what else do we know? Well, just like us, the script starts by trying to learn more about itself.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">PROG</span><span class="o">=</span><span class="s2">&quot;$(basename $0)&quot;</span>
+</span><span class='line'><span class="nv">NAME</span><span class="o">=</span><span class="k">${</span><span class="nv">PROG</span><span class="p">%-*</span><span class="k">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The argument <code>$0</code> is the name of the command or script that is run. For example, the <code>$0</code> for <code>ls -l</code> is <code>ls</code>. The command <code>basename</code> strips away both the path to the file and the file extensions. So if you were to call <code>libinput-gestures/libinput-gestures-setup</code> or even .<code>/libinput-gestures-setup</code>, it would take away the first part, making <code>$PROG</code> result in <code>libinput-gestures-setup</code>.</p>
+
+<p>In bash, a <code>%</code> means to remove what comes after it from the suffix. And since what comes after it is <code>-*</code>, meaning the <code>-</code> and everything after it are removed, making <code>$NAME</code> become <code>libinput-gestures</code>. For some interesting and related facts, while <code>%</code> removes everything after the the last instance it finds, <code>%%</code> removes everything after the first instance. While <code>%</code> and <code>%%</code> deal with suffixes, their prefix equivalents are <code>#</code> and <code>##</code> (however, this time <code>##</code> looks for the last instance). And finally, it is an absolute pain to google the symbol <code>%</code>. Yes, even with quotes.</p>
+
+<p>Great! Now we&rsquo;ve gotten through two lines of code! Wasn&rsquo;t that exciting? Well, now we&rsquo;re going to skip around a bit. Don&rsquo;t worry, well cover everything we missed. But first, let&rsquo;s zoom out for a second. The setup script allows for two command line arguments, <code>-d</code> and <code>-r</code>. <code>-d</code> takes and argument, which is used to determine the destination where everything is installed. By default, it&rsquo;s empty and causes everything to be installed in children of the root folder, but the script does give you the option to specify. You probably shouldn&rsquo;t need to if you just plan on installing, but it&rsquo;s good to have options. The <code>-r</code> argument force allows root to perform user commands, and is not recommended. For a more in depth look at these commands, keep reading my blog. Until then, let&rsquo;s look at how arguments are actually parsed.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</span><span class='line'><span class="nv">FORCEROOT</span><span class="o">=</span>0
+</span><span class='line'><span class="k">while</span> <span class="nb">getopts </span>d:r c<span class="p">;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nv">$c</span> in
+</span><span class='line'>    d<span class="o">)</span> <span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">&quot;$OPTARG&quot;</span><span class="p">;;</span>
+</span><span class='line'>    r<span class="o">)</span> <span class="nv">FORCEROOT</span><span class="o">=</span>1<span class="p">;;</span>
+</span><span class='line'>    <span class="se">\?</span><span class="o">)</span> usage<span class="p">;;</span>
+</span><span class='line'>    <span class="k">esac</span>
+</span><span class='line'><span class="k">done</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">shift</span> <span class="k">$((</span>OPTIND <span class="o">-</span> <span class="m">1</span><span class="k">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first two lines are simple, they&rsquo;re setting the defaults of variables that may or may not be overridden later. But the third is where things get interesting. Given that many bash functions take in arguments of the form <code>-a test -b</code>, there needs to be a builtin to parse them. And that&rsquo;s what getopts is. It&rsquo;s used in a while loop (or for each loop, whichever helps to visualize it better) to make sure that every option is parsed, as the loop will run for every option. Now let&rsquo;s look at the first argument, <code>d:r</code>. The script&rsquo;s two arguments, <code>-d</code> and <code>-r</code> are present, with <code>-d</code>, which takes an argument, on the left, and <code>-r</code>, which does not, on the right. The second getopts argument, <code>c</code>, will be filled with the argument the user uses. At the same time, if applicable, the builtin <code>$OPTARG</code> will be filled with the argument&rsquo;s argument. For example, if the user types in the command <code>./libinput-gestures-setup -d place -r</code>, the first pass of the while loop will fill <code>$c</code> with <code>d</code> and <code>$OPTARG</code> with <code>test</code>, and on the second pass <code>$c</code> will fill with <code>r</code>.</p>
+
+<p>Now that we know <code>$c</code> is being filled in with something, the question is what we can do about that. And the answer is a case statement. Interestingly enough, the case command&rsquo;s man page calls it obsolete and says it should be replaced by switch statements. Though case statements seem far more popular online. In this particular case, the programmer probably doesn&rsquo;t need to switch, but it&rsquo;s something to keep in mind.</p>
+
+<p>Once you get past the confusing getopts syntax, case statements are fairly readable. The syntax checks what <code>$c</code> is against <code>d</code>, and if so sets <code>$DESTDIR</code> to <code>$OPTARG</code>, which holds <code>-d</code>&rsquo;s argument. All case statements are terminated with two semicolons. Similar is the case for <code>r</code>. If an illegal option is called, the case <code>\?</code> will trigger. This calls the function <code>usage</code>, which outputs the script&rsquo;s usage as text and then quits with an error. After the case is chosen, the case statement will end with <code>esac</code>.</p>
+
+<p>Why <code>esac</code>? To slightly paraphrase <a href="https://unix.stackexchange.com/a/256175">this answer</a>, the <code>case</code>/<code>esac</code> convention, as well as if statements ending in fi, comes from ALGOL68. Both the original <code>sh</code> shell and ALGOL68 have, the same author, Stephen Borne. One of the influences <code>sh</code> took from ALGOL68 are the <code>case</code>/<code>esac</code> and <code>if</code>/<code>fi</code> openings and closings. ALGOL68 also has <code>do</code>/<code>od</code> as a pair, but <code>od</code> is already a keyword in bash (octal dump), so that was scrapped in favor of <code>done</code>.</p>
+
+<p>This leaves us with one final line of code, <code>shift $((OPTIND - 1))</code>. Of the statement above, this part is the most enigmatic. If you google around to understand getopts, you&rsquo;ll find that this part is usually ignored. You don&rsquo;t achieve anything by modifying it, and it&rsquo;s something you put at the end no matter what. So, what does this command actually do, and how does it work?</p>
+
+<p>Starting from the beginning, the variable <code>$OPTIND</code>, short for option index, is part of the <code>getopts</code> utility. When <code>getopts</code> runs through the command line argument, like a for each loop, it needs something to look at next. At all times, the next argument for <code>getopts</code> is stored in <code>$OPTIND</code>. How does this work so easily? <code>$OPTIND</code> isn&rsquo;t actually storage, but a number. Remember, <code>$1</code> in bash will get you the first argument, <code>$2</code> the second, and so on. So <code>$OPTIND</code> starts at 1 and is incremented with each pass. If you run the program with 3 arguments, <code>$OPTIND</code> will end as 4.</p>
+
+<p>In bash, double parentheses evaluate an expression, and a $ in front of them returns the result as a statement. So shift is being called on the result of <code>$OPTIND - 1</code>. <code>shift</code> is a command which shifts the position of arguments to the left by the number given to it as argument. That is, if you run <code>shift 2</code>, the variable that used to be referenced with <code>$4</code> can now be referenced with <code>$2.</code> Because <code>$OPTIND</code> is always one more than the number of optional arguments, shifting by <code>$OPTIND - 1</code> will make the main arguments always be in the same place. So for example calling <code>./libinput-gestures-setup -d place install</code> and <code>./libinput-gestures-setup install</code> will both lead to <code>install</code> being <code>$1</code> after the shift happens.</p>
+
+<p>The next function is fairly simple.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$# </span>-ne <span class="m">1</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>    usage
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The program wants you to input only one main command, in this case <code>start</code>, <code>stop</code>, <code>restart</code>, <code>autostart</code>, <code>autostop</code>, or <code>status</code>. If you give it a number of commands that is not one, it will display the usage. The program checks if you are giving it only one argument (after the shift), with <code>[[ $# -ne 1 ]]</code>. Double square brackets surround a statement. <code>-ne</code> compares two numbers to see if they are not equal, in this case <code>$#</code> or the number of arguments, and 1. So if the number of arguments is not equal to one, the <code>usage</code> function is triggered. Otherwise, you can proceed on to</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">cmd</span><span class="o">=</span><span class="s2">&quot;$1&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Whatever the main command is, it&rsquo;s stored in the argument <code>$1</code>. So now the script knows what you&rsquo;re trying to do, and sets it as the <code>$cmd</code> variable.</p>
+
+<p>That&rsquo;s all for this entry, but keep reading to find out what&rsquo;s next. Check out this blog next time for more exciting code. In either way you interpret that sentence.</p>
+
+  
+  
+
+
+    </article>
+  
+  
+    <article class="post">
+      <div class="sharing-box">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthbeep.github.io/index.html" data-via="" data-counturl="http://darthbeep.github.io/index.html" data-size="large">Tweet</a>
+  
+  
+  
+</div>
+
+      
+  <header>
+    
+      <h2 class="entry-title">
+        
         <a href="/blog/2019/06/30/how-i-linked-my-3ds-as-my-controller-on-linux/">How I Linked My 3DS as My Controller on Linux</a>
         
       </h2>
@@ -143,7 +273,7 @@
 
 <p>After a bit of googling, I decided on <a href="https://github.com/phijor/ctroller">this repository</a>, called ctroller. There was one other, but this had the prettiest readme.  One thing to keep in mind about the repository is that it has two parts. One for the Linux side, which has a server that interprets data sent from the 3DS into a device on the system, and the 3DS side, which builds a 3DS application the 3DS uses to send the data. Well, now that I had a repo, it was time to build all the things.</p>
 
-<p>First, on to the Linux side of things. The repository tells you to install the AUR package <code>ctroller-git</code>, which couldn&rsquo;t be installed, or <code>ctroller-bin</code>, which could. Then I just typed in make install and it worked perfectly. That was easy. Going off of this it should be smooth sailing for the rest of the setup, right?</p>
+<p>First, on to the Linux side of things. The repository tells you to install the AUR package <code>ctroller-git</code>, which couldn&rsquo;t be installed, or <code>ctroller-bin</code>, which could. Then I just typed in <code>make install</code> and it worked perfectly. That was easy. Going off of this it should be smooth sailing for the rest of the setup, right?</p>
 
 <p>The next step is to get the 3DS files on your 3DS. You can either download them or make them yourself. Personally, I only use locally-sourced, grass-fed, vaccine-free binaries. So obviously I was going to build them myself. So I followed the instructions and went into the 3DS folder.</p>
 
@@ -306,7 +436,7 @@
     
       <h2 class="entry-title">
         
-        <a href="/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/">How Do Linux Gestures Work? Part I: Before You Install</a>
+        <a href="/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/">Analyzing an Open Source Project: Part I -- Before You Install</a>
         
       </h2>
     

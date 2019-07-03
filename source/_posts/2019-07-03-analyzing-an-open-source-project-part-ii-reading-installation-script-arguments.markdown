@@ -31,7 +31,7 @@ while getopts d:r c; do
     esac
 done
 
-shift $((OPTIND – 1))
+shift $((OPTIND - 1))
 {% endcodeblock %}
 
 The first two lines are simple, they're setting the defaults of variables that may or may not be overridden later. But the third is where things get interesting. Given that many bash functions take in arguments of the form `-a test -b`, there needs to be a builtin to parse them. And that's what getopts is. It's used in a while loop (or for each loop, whichever helps to visualize it better) to make sure that every option is parsed, as the loop will run for every option. Now let's look at the first argument, `d:r`. The script's two arguments, `-d` and `-r` are present, with `-d`, which takes an argument, on the left, and `-r`, which does not, on the right. The second getopts argument, `c`, will be filled with the argument the user uses. At the same time, if applicable, the builtin `$OPTARG` will be filled with the argument's argument. For example, if the user types in the command `./libinput-gestures-setup -d place -r`, the first pass of the while loop will fill `$c` with `d` and `$OPTARG` with `test`, and on the second pass `$c` will fill with `r`.
@@ -46,7 +46,7 @@ This leaves us with one final line of code, `shift $((OPTIND - 1))`. Of the stat
 
 Starting from the beginning, the variable `$OPTIND`, short for option index, is part of the `getopts` utility. When `getopts` runs through the command line argument, like a for each loop, it needs something to look at next. At all times, the next argument for `getopts` is stored in `$OPTIND`. How does this work so easily? `$OPTIND` isn't actually storage, but a number. Remember, `$1` in bash will get you the first argument, `$2` the second, and so on. So `$OPTIND` starts at 1 and is incremented with each pass. If you run the program with 3 arguments, `$OPTIND` will end as 4.
 
-In bash, double parentheses evaluate an expression, and a $ in front of them returns the result as a statement. So shift is being called on the result of `$OPTIND - 1`. `shift` is a command which shifts the position of arguments to the left by the number given to it as argument. That is, if you run `shift 2`, the variable that used to be referenced with `$4` can now be referenced with `$2.` Because `$OPTIND` is always one more than the number of optional arguments, shifting by `$OPTIND - 1` will make the main arguments always be in the same place. So for example calling `./libinput-gestures-setup -d “place” install` and `./libinput-gestures-setup install` will both lead to `install` being `$1` after the shift happens.
+In bash, double parentheses evaluate an expression, and a $ in front of them returns the result as a statement. So shift is being called on the result of `$OPTIND - 1`. `shift` is a command which shifts the position of arguments to the left by the number given to it as argument. That is, if you run `shift 2`, the variable that used to be referenced with `$4` can now be referenced with `$2.` Because `$OPTIND` is always one more than the number of optional arguments, shifting by `$OPTIND - 1` will make the main arguments always be in the same place. So for example calling `./libinput-gestures-setup -d place install` and `./libinput-gestures-setup install` will both lead to `install` being `$1` after the shift happens.
 
 The next function is fairly simple.
 
