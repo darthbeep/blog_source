@@ -4,7 +4,7 @@
   <title><![CDATA[Opening Open Source]]></title>
   <link href="http://darthbeep.github.io/atom.xml" rel="self"/>
   <link href="http://darthbeep.github.io/"/>
-  <updated>2019-07-03T04:26:02-04:00</updated>
+  <updated>2019-07-24T16:00:14-04:00</updated>
   <id>http://darthbeep.github.io/</id>
   <author>
     <name><![CDATA[Shaina Peters]]></name>
@@ -12,6 +12,127 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Analyzing an Open Source Project: Part III -- If Statements]]></title>
+    <link href="http://darthbeep.github.io/blog/2019/07/24/analyzing-an-open-source-project-part-iii-if-statements/"/>
+    <updated>2019-07-24T15:49:35-04:00</updated>
+    <id>http://darthbeep.github.io/blog/2019/07/24/analyzing-an-open-source-project-part-iii-if-statements</id>
+    <content type="html"><![CDATA[<p>And here&rsquo;s Part III of Analyzing an Open Source Project. <a href="http://darthbeep.github.io/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/">Last time</a> we started reading the install script of <a href="https://github.com/bulletmark/libinput-gestures">libinput-gestures</a> (<a href="https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup#L147">here&rsquo;s</a> the file we&rsquo;re looking at, click to read along), and we haven&rsquo;t sped up since. The goal of this blog is to read open source projects, but to look at everything. Every. Single. Thing! There are plenty of tangents but you won&rsquo;t be missing out on a single detail. So without further ado.</p>
+
+<p>Now that we&rsquo;ve set our cmd variable to the entered command and done our variable parsing, it&rsquo;s time to use our variables. While the next things to look at are functions that will be run later, we&rsquo;re going in execution order, so now we&rsquo;re going to skip to line 147 where the script really starts happening.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="nv">$cmd</span> <span class="o">==</span> install <span class="o">||</span> <span class="nv">$cmd</span> <span class="o">==</span> uninstall <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Everything until the end is wrapped in this if statement and its corresponding else. This is a typical example of a bash if statement, and contains no surprises. It can be read with knowledge of any other programming language, or even English. Simply put, the if statement checks the truthfulness of what&rsquo;s in the double brackets. Single brackets could also be used. While double brackets have less surprises and are more smoothed out, single brackets are a <a href="https://pubs.opengroup.org/onlinepubs/9699919799/">POSIX</a> standard and therefore more portable. Because double brackets are a bash extension, they do require the user to learn a little more, but most of that is intuitive or googleable. But if you code, you can generally choose which one you want to use.</p>
+
+<p>The contents of the if statement are exactly what they seem. <code>$cmd == install</code> returns, well, if <code>$cmd</code> is equal to <code>install</code>. The reason <code>==</code> is used instead of <code>-eq</code> is because <code>-eq</code> is for numbers and <code>==</code> is for strings.</p>
+
+<p>At first I wanted to say that <code>||</code> worked differently in bash based on the fact that is often used outside of scripts. It&rsquo;s common to write <code>function || error</code>, where error will run if function returns an error (manifested by a non-zero value, in contrast to most programming languages, though this makes sense because many bash scripts use their number outputted as the error message). However, instead of working differently in and out of conditionals, <code>||</code> works exactly the same, though it is often used differently. It goes to the first value, sees if it&rsquo;s true or not, and continues until something is true. It then returns if it is able to find a true statement or not.</p>
+
+<p>Realizing that in bash <code>||</code> is more commonly used outside of conditionals than in them, I wondered if it were true in other languages. In perl, if a function might error, it&rsquo;s common to write code similar to <code>function() or die</code>, where if the function fails the die command is run with an optional error message. But what about other languages, where <code>||</code> is confined to if statements? Well, I opened up a python shell.</p>
+
+<figure class='code'><figcaption><span>python shell </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="s">&quot;psyduck&quot;</span>
+</span><span class='line'><span class="s">&#39;psyduck&#39;</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s">&quot;penn&quot;</span>
+</span><span class='line'><span class="mi">0</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="s">&quot;muack&quot;</span>
+</span><span class='line'><span class="mi">1</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="s">&quot;blob&quot;</span>
+</span><span class='line'><span class="s">&#39;blob&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And C?</p>
+
+<figure class='code'><figcaption><span>test.c </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;psyduck &quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;penn &quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="mi">1</span> <span class="o">||</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;muack &quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="mi">0</span> <span class="o">||</span> <span class="n">printf</span><span class="p">(</span><span class="s">&quot;blob</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//prints &quot;psyduck blob&quot;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note: Psyduck, Penn, Muack, and Blob are my stuffed platypodes. They are very cute.</p>
+
+<p>It seems that instead of one line if statements, and or or operands with error messages could work as well. In fact, I may start using them to shorten my code. But back on topic. After the brackets are closed again, a semicolon stands in place for a newline, which is followed by a then, which says that everything after should be executed. Then is needed because if statements don&rsquo;t need to be confined to just one set of brackets (and in fact can have any amount of brackets from 0 to infinity, with any number of things stringing them together). Now that the then is in place, we can finally analyze the if statement. Let&rsquo;s look at it&rsquo;s first line.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">DESTDIR</span><span class="o">=</span><span class="s2">&quot;${DESTDIR%%+(/)}&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Last time we determined that DESTDIR is by default <code>""</code> but can be set to any directory with the -d argument. We also covered substitution, which tells us that everything after the <code>%%</code> containing exactly <code>+(/)</code> is removed. Because this substitution is extremely specific and doesn&rsquo;t contain a common case, I believe it is an artifact from testing.</p>
+
+<p>Next we have another if statement.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[[</span> -z <span class="nv">$DESTDIR</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>id -un<span class="k">)</span> !<span class="o">=</span> root <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;Install or uninstall must be run as sudo/root.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&rsquo;m going to avoid repeating myself and not discuss anything previously discussed. For the if statement to trigger, two conditions must be met. First, <code>-z</code> checks if something is <code>null</code>, so <code>$DESTDIR</code> be an empty string. Second the output of <code>id -un</code> must not be equal to <code>root</code>. <code>id</code> is a function that gives information on users, with <code>-u</code> giving only information on the user running the command and -n giving the user&rsquo;s name. So <code>id -un</code> will only output root if the user is running the script as root. Therefore, the if statement will only trigger if <code>$DESTDIR</code> is an empty string (in this case representing the root directory) and if the user is not <code>root</code>. Essentially checking if the user is trying to build the directory in a place they have access to. If the user doesn&rsquo;t have access to the directory, the script will exit with an error.</p>
+
+<p>However, this method of checking is not perfect. If the user tries to build in a non <code>root</code> directory they don&rsquo;t have access to as non <code>root</code> (and this sentence is why you shouldn&rsquo;t give a person and a place the same name), this error checker wont trigger.</p>
+
+<p>The smarter thing would be to check if the user is not root and not the owner of the file (admittedly this leaves out groups and everyone-can-edit directories, but those are really edge cases). The command <code>stat</code> gives information on the file, and its <code>--format</code> argument allows it to display only certain things. When <code>--format</code> is set to <code>"%U"</code>, it only prints out the user. So put together.</p>
+
+<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="k">if</span> <span class="o">[[</span> <span class="k">$(</span>id -un<span class="k">)</span> !<span class="o">=</span> <span class="k">$(</span>stat --format<span class="o">=</span><span class="s2">&quot;%U&quot;</span> <span class="s2">&quot;$DESTDIR/&quot;</span><span class="k">)</span> <span class="o">&amp;&amp;</span> <span class="k">$(</span>id -un<span class="k">)</span> !<span class="o">=</span> root <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span><span class='line'>  <span class="nb">echo</span> <span class="s2">&quot;Install or uninstall must be run as sudo/root.&quot;</span>
+</span><span class='line'>  <span class="nb">exit </span>1
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Because apparently six lines merit a whole entry, that&rsquo;s all for today. But on the bright side, I actually wrote some code. And I got to plug my stuffed platypodes. Keep reading and you might get a picture. But that&rsquo;s all for today.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Analyzing an Open Source Project: Part II -- Reading Installation Script Arguments]]></title>
@@ -262,9 +383,9 @@
     <link href="http://darthbeep.github.io/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install/"/>
     <updated>2019-06-22T23:52:26-04:00</updated>
     <id>http://darthbeep.github.io/blog/2019/06/22/how-do-linux-gestures-work-part-i-before-you-install</id>
-    <content type="html"><![CDATA[<p>I&rsquo;m probably one of the only Linux users who really like gestures. Going back a web page and switching desktops with a swipe of my fingers is really easy and convenient. But when I switched to Linux, I found the support rediculously lacking. It took a week of searching and trial and error to finally figure out how to implemnet gestures, at which point I stumbled upon <a href="https://github.com/bulletmark/libinput-gestures" title="libinput-gestures">libinput gestures</a>, which finally did solve my problem. Now that I have a solution (and a fair amount of time has passed) I want to work on a project: documenting open source. But not just going over the functions, but going extremely in depth and looking at EVERYTHING that happens.</p>
+    <content type="html"><![CDATA[<p>I&rsquo;m probably one of the only Linux users who really like gestures. Going back a web page and switching desktops with a swipe of my fingers is really easy and convenient. But when I switched to Linux, I found the support ridiculously lacking. It took a week of searching and trial and error to finally figure out how to implement gestures, at which point I stumbled upon <a href="https://github.com/bulletmark/libinput-gestures" title="libinput-gestures">libinput gestures</a>, which finally did solve my problem. Now that I have a solution (and a fair amount of time has passed) I want to work on a project: documenting open source. But not just going over the functions, but going extremely in depth and looking at EVERYTHING that happens.</p>
 
-<p>This guide won&rsquo;t just show off what happens to make gestures work, but will talk about everything along the way. While the actual code is written in python, this part will only focus on bash and make. For an in depth analysis of the code, look for later parts. Because this code is based on the libinput-gestures code, you should familiarise yourself with the README and Makefile before or during your reading. Now let&rsquo;s get started.</p>
+<p>This guide won&rsquo;t just show off what happens to make gestures work, but will talk about everything along the way. While the actual code is written in python, this part will only focus on bash and make. For an in depth analysis of the code, look for later parts. Because this code is based on the libinput-gestures code, you should familiarize yourself with the README and Makefile before or during your reading. Now let&rsquo;s get started.</p>
 
 <p>No matter where you go to do your gestures, you’ll encounter the same command before you start:</p>
 
