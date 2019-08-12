@@ -9,7 +9,7 @@
   <meta name="author" content="Shaina Peters">
 
   
-  <meta name="description" content="Tweet Analyzing an Open Source Project: Part III -- if Statements Jul 24th, 2019 3:49 pm bash, conditionals, gestures, libinput-gestures, linux And &hellip;">
+  <meta name="description" content="Tweet Solving Git Lfs Issues -- for When Your Unity Assets Won't Load Aug 11th, 2019 9:35 pm bash, git, solutions, unity Unlike my usual posts on &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -94,6 +94,99 @@
   </header>
   <section id="main">
       
+  
+  
+    <article class="post">
+      <div class="sharing-box">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://darthbeep.github.io/index.html" data-via="" data-counturl="http://darthbeep.github.io/index.html" data-size="large">Tweet</a>
+  
+  
+  
+</div>
+
+      
+  <header>
+    
+      <h2 class="entry-title">
+        
+        <a href="/blog/2019/08/11/solving-git-lfs-issues-for-when-your-unity-assets-wont-load/">Solving Git Lfs Issues -- for When Your Unity Assets Won't Load</a>
+        
+      </h2>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-08-11T21:35:17-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>9:35 pm</span></time>
+		
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/git/'>git</a>, <a class='category' href='/blog/categories/solutions/'>solutions</a>, <a class='category' href='/blog/categories/unity/'>unity</a>
+  
+</span>
+
+
+        
+      </p>
+    
+  </header>
+
+
+  <p>Unlike my usual posts on how something works, this post is a solution post. It presents a problem I recently had, and how I solved it. If you’re also interested in solving things, go ahead and read this, and maybe try to find a solution and compare your answers with mine. But the intended audience for this post is people who are trying to solve this problem.</p>
+
+<p>I’ll start by describing the problem. I recently participated in a game jam with some friends. <a href="https://hwkeyser.itch.io/one-engine-left">Here</a> is our game, if you want to try it out. But on two computers, mine (Arch Linux), and a friend’s (oldish Mac), none of the assets would load. We were using Unity, with both our own custom asset files and TextMesh Pro assets, both of which failed to load.</p>
+
+<p>So how did I solve this?</p>
+
+<p>First I checked on the asset files themselves. At first I was worried they weren’t cloned correctly, and when I <code>cat</code>ed them I got this.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>cat Sunny<span class="se">\ </span>Days<span class="se">\ </span>-<span class="se">\ </span>Seamless.jpg
+</span><span class='line'>version https://git-lfs.github.com/spec/v1
+</span><span class='line'>oid sha256:ab6536daf74188dfc075d65f5d85aca9efeaead7f03b905514e53076d854f365
+</span><span class='line'>size 273488
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Well, that doesn’t look like what usually happens when you cat a jpg. Was it uploaded wrong? I went to the GitHub page for the file to check. But the image on GitHub looked normal. Well, with one added detail.</p>
+
+<p><img src="images/2019/08/bloglfs.png" alt="Stored with Git LFS" /></p>
+
+<p><code>Stored with Git LFS</code>. Clicking on the question mark took me <a href="https://help.github.com/en/articles/versioning-large-files">here</a>. Essentially, Git LFS, or Git Large File Storage, is GitHub’s way of storing large files. Rather than put the files where they appear in the repository, it stores them elsewhere and puts a pointer file in their place. You can read more about it <a href="https://help.github.com/en/articles/about-git-large-file-storage">here</a>. But what does this have to do with solving the problem? Well now that we know the reason files look strange is because they are being hidden with Git LFS, we can use Git LFS to find them.</p>
+
+<p>Unfortunately, Git LFS isn’t preinstalled, at least on some systems. Fortunately, it is at least on the AUR and homebrew. Weirdly enough, the package has to be downloaded manually on Debian/Ubuntu, but you can find the instructions for that <a href="https://github.com/git-lfs/git-lfs/wiki/Installation#debian-and-ubuntu">here</a>.</p>
+
+<p>Once you’ve downloaded git-lfs, you need to install it. Just do it once with</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git lfs install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now Git LFS is installed! Any new repos you clone will clone large files properly automatically. Unfortunately, that doesn’t include current ones. Those require a bit of extra work. If you’re feeling lazy, you can just delete and reclone the repo. Otherwise, just type</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>git lfs fetch
+</span><span class='line'><span class="nv">$ </span>git lfs pull
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And you’re done! If you cat image files, you will be greeted with binary files and not plaintext. And now if you open up the project in unity, you will be able to use assets. Happy coding!</p>
+
+  
+  
+
+
+    </article>
   
   
     <article class="post">

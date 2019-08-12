@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://darthbeep.github.io/blog/2019/08/11/solving-git-lfs-issues-for-when-your-unity-assets-wont-load/</loc>
+<lastmod>2019-08-11T21:35:17-04:00</lastmod>
+</url>
+<url>
 <loc>http://darthbeep.github.io/blog/2019/07/24/analyzing-an-open-source-project-part-iii-if-statements/</loc>
 <lastmod>2019-07-24T15:49:35-04:00</lastmod>
 </url>
@@ -54,5 +58,14 @@
 </url>
 <url>
 <loc>http://darthbeep.github.io/blog/categories/conditionals/</loc>
+</url>
+<url>
+<loc>http://darthbeep.github.io/blog/categories/solutions/</loc>
+</url>
+<url>
+<loc>http://darthbeep.github.io/blog/categories/git/</loc>
+</url>
+<url>
+<loc>http://darthbeep.github.io/blog/categories/unity/</loc>
 </url>
 </urlset>
