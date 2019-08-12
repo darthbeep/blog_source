@@ -4,7 +4,7 @@
   <title><![CDATA[Opening Open Source]]></title>
   <link href="http://darthbeep.github.io/atom.xml" rel="self"/>
   <link href="http://darthbeep.github.io/"/>
-  <updated>2019-07-24T16:00:14-04:00</updated>
+  <updated>2019-07-24T16:05:07-04:00</updated>
   <id>http://darthbeep.github.io/</id>
   <author>
     <name><![CDATA[Shaina Peters]]></name>
@@ -34,7 +34,7 @@
 
 <p>At first I wanted to say that <code>||</code> worked differently in bash based on the fact that is often used outside of scripts. It&rsquo;s common to write <code>function || error</code>, where error will run if function returns an error (manifested by a non-zero value, in contrast to most programming languages, though this makes sense because many bash scripts use their number outputted as the error message). However, instead of working differently in and out of conditionals, <code>||</code> works exactly the same, though it is often used differently. It goes to the first value, sees if it&rsquo;s true or not, and continues until something is true. It then returns if it is able to find a true statement or not.</p>
 
-<p>Realizing that in bash <code>||</code> is more commonly used outside of conditionals than in them, I wondered if it were true in other languages. In perl, if a function might error, it&rsquo;s common to write code similar to <code>function() or die</code>, where if the function fails the die command is run with an optional error message. But what about other languages, where <code>||</code> is confined to if statements? Well, I opened up a python shell.</p>
+<p>Realizing that in bash <code>||</code> is more commonly used outside of conditionals than in them, I wondered if it were true in other languages. In perl, if a function might error, it&rsquo;s common to write code similar to <code>function() or die</code>, where if the function fails the die command is run with an optional error message. But what about other languages, where <code>||</code> is usually confined to conditionals? Well, I opened up a python shell.</p>
 
 <figure class='code'><figcaption><span>python shell </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -112,14 +112,13 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I&rsquo;m going to avoid repeating myself and not discuss anything previously discussed. For the if statement to trigger, two conditions must be met. First, <code>-z</code> checks if something is <code>null</code>, so <code>$DESTDIR</code> be an empty string. Second the output of <code>id -un</code> must not be equal to <code>root</code>. <code>id</code> is a function that gives information on users, with <code>-u</code> giving only information on the user running the command and -n giving the user&rsquo;s name. So <code>id -un</code> will only output root if the user is running the script as root. Therefore, the if statement will only trigger if <code>$DESTDIR</code> is an empty string (in this case representing the root directory) and if the user is not <code>root</code>. Essentially checking if the user is trying to build the directory in a place they have access to. If the user doesn&rsquo;t have access to the directory, the script will exit with an error.</p>
+<p>I&rsquo;m going to avoid repeating myself and not discuss anything previously discussed. For the if statement to trigger, two conditions must be met. First, <code>-z</code> checks if something is <code>null</code>, so <code>$DESTDIR</code> be an empty string. Second the output of <code>id -un</code> must not be equal to <code>root</code>. <code>id</code> is a function that gives information on users, with <code>-u</code> giving only information on the user running the command and <code>-n</code> giving the user&rsquo;s name. So <code>id -un</code> will only output root if the user is running the script as root. Therefore, the if statement will only trigger if <code>$DESTDIR</code> is an empty string (in this case representing the root directory) and if the user is not <code>root</code>. Essentially checking if the user is trying to build the directory in a place they have access to. If the user doesn&rsquo;t have access to the directory, the script will exit with an error.</p>
 
 <p>However, this method of checking is not perfect. If the user tries to build in a non <code>root</code> directory they don&rsquo;t have access to as non <code>root</code> (and this sentence is why you shouldn&rsquo;t give a person and a place the same name), this error checker wont trigger.</p>
 
-<p>The smarter thing would be to check if the user is not root and not the owner of the file (admittedly this leaves out groups and everyone-can-edit directories, but those are really edge cases). The command <code>stat</code> gives information on the file, and its <code>--format</code> argument allows it to display only certain things. When <code>--format</code> is set to <code>"%U"</code>, it only prints out the user. So put together.</p>
+<p>One smarter thing would be to check if the user is not root and not the owner of the file (admittedly this leaves out groups and everyone-can-edit directories, but those are really edge cases). The command <code>stat</code> gives information on the file, and its <code>--format</code> argument allows it to display only certain things. When <code>--format</code> is set to <code>"%U"</code>, it only prints out the user. So put together.</p>
 
-<figure class='code'><figcaption><span>libinput-gestures-setup </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -219,7 +218,7 @@
 
 <p>Whatever the main command is, it&rsquo;s stored in the argument <code>$1</code>. So now the script knows what you&rsquo;re trying to do, and sets it as the <code>$cmd</code> variable.</p>
 
-<p>That&rsquo;s all for this entry, but keep reading to find out what&rsquo;s next. Check out this blog next time for more exciting code. In either way you interpret that sentence.</p>
+<p>That&rsquo;s all for this entry, but keep reading to find out what&rsquo;s next. Check out this blog <a href="http://darthbeep.github.io/blog/2019/07/24/analyzing-an-open-source-project-part-iii-if-statements/">next time</a> for more exciting code. In either way you interpret that sentence.</p>
 ]]></content>
   </entry>
   

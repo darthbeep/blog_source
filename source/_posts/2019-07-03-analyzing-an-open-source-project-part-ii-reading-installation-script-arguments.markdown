@@ -64,4 +64,4 @@ cmd="$1"
 
 Whatever the main command is, it's stored in the argument `$1`. So now the script knows what you're trying to do, and sets it as the `$cmd` variable.
 
-That's all for this entry, but keep reading to find out what's next. Check out this blog next time for more exciting code. In either way you interpret that sentence.
+That's all for this entry, but keep reading to find out what's next. Check out this blog [next time](/blog/2019/07/24/analyzing-an-open-source-project-part-iii-if-statements/) for more exciting code. In either way you interpret that sentence.

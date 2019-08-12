@@ -3,7 +3,7 @@ layout: post
 title: "Analyzing an Open Source Project: Part III -- If Statements"
 date: 2019-07-24 15:49:35 -0400
 comments: true
-categories: [libinput-gestures, gestures, bash, linux, conditionals, or]
+categories: [libinput-gestures, gestures, bash, linux, conditionals]
 ---
 And here's Part III of Analyzing an Open Source Project. [Last time](/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/) we started reading the install script of [libinput-gestures](https://github.com/bulletmark/libinput-gestures) ([here's](https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup#L147) the file we're looking at, click to read along), and we haven't sped up since. The goal of this blog is to read open source projects, but to look at everything. Every. Single. Thing! There are plenty of tangents but you won't be missing out on a single detail. So without further ado.
 
@@ -19,7 +19,7 @@ The contents of the if statement are exactly what they seem. `$cmd == install` r
 
 At first I wanted to say that `||` worked differently in bash based on the fact that is often used outside of scripts. It's common to write `function || error`, where error will run if function returns an error (manifested by a non-zero value, in contrast to most programming languages, though this makes sense because many bash scripts use their number outputted as the error message). However, instead of working differently in and out of conditionals, `||` works exactly the same, though it is often used differently. It goes to the first value, sees if it's true or not, and continues until something is true. It then returns if it is able to find a true statement or not.
 
-Realizing that in bash `||` is more commonly used outside of conditionals than in them, I wondered if it were true in other languages. In perl, if a function might error, it's common to write code similar to `function() or die`, where if the function fails the die command is run with an optional error message. But what about other languages, where `||` is confined to if statements? Well, I opened up a python shell.
+Realizing that in bash `||` is more commonly used outside of conditionals than in them, I wondered if it were true in other languages. In perl, if a function might error, it's common to write code similar to `function() or die`, where if the function fails the die command is run with an optional error message. But what about other languages, where `||` is usually confined to conditionals? Well, I opened up a python shell.
 
 {% codeblock lang:python python shell %}
 >>> 1 and "psyduck"
@@ -68,13 +68,13 @@ if [[ -z $DESTDIR && $(id -un) != root ]]; then
 fi
 {% endcodeblock %}
 
-I'm going to avoid repeating myself and not discuss anything previously discussed. For the if statement to trigger, two conditions must be met. First, `-z` checks if something is `null`, so `$DESTDIR` be an empty string. Second the output of `id -un` must not be equal to `root`. `id` is a function that gives information on users, with `-u` giving only information on the user running the command and -n giving the user's name. So `id -un` will only output root if the user is running the script as root. Therefore, the if statement will only trigger if `$DESTDIR` is an empty string (in this case representing the root directory) and if the user is not `root`. Essentially checking if the user is trying to build the directory in a place they have access to. If the user doesn't have access to the directory, the script will exit with an error.
+I'm going to avoid repeating myself and not discuss anything previously discussed. For the if statement to trigger, two conditions must be met. First, `-z` checks if something is `null`, so `$DESTDIR` be an empty string. Second the output of `id -un` must not be equal to `root`. `id` is a function that gives information on users, with `-u` giving only information on the user running the command and `-n` giving the user's name. So `id -un` will only output root if the user is running the script as root. Therefore, the if statement will only trigger if `$DESTDIR` is an empty string (in this case representing the root directory) and if the user is not `root`. Essentially checking if the user is trying to build the directory in a place they have access to. If the user doesn't have access to the directory, the script will exit with an error.
 
 However, this method of checking is not perfect. If the user tries to build in a non `root` directory they don't have access to as non `root` (and this sentence is why you shouldn't give a person and a place the same name), this error checker wont trigger.
 
-The smarter thing would be to check if the user is not root and not the owner of the file (admittedly this leaves out groups and everyone-can-edit directories, but those are really edge cases). The command `stat` gives information on the file, and its `--format` argument allows it to display only certain things. When `--format` is set to `"%U"`, it only prints out the user. So put together.
+One smarter thing would be to check if the user is not root and not the owner of the file (admittedly this leaves out groups and everyone-can-edit directories, but those are really edge cases). The command `stat` gives information on the file, and its `--format` argument allows it to display only certain things. When `--format` is set to `"%U"`, it only prints out the user. So put together.
 
-{% codeblock lang:bash libinput-gestures-setup %}
+{% codeblock lang:bash %}
 if [[ $(id -un) != $(stat --format="%U" "$DESTDIR/") && $(id -un) != root ]]; then
 	echo "Install or uninstall must be run as sudo/root."
 	exit 1
