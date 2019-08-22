@@ -5,7 +5,7 @@ date: 2019-07-24 15:49:35 -0400
 comments: true
 categories: [libinput-gestures, gestures, bash, linux, conditionals]
 ---
-And here's Part III of Analyzing an Open Source Project. [Last time](/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/) we started reading the install script of [libinput-gestures](https://github.com/bulletmark/libinput-gestures) ([here's](https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup#L147) the file we're looking at, click to read along), and we haven't sped up since. The goal of this blog is to read open source projects, but to look at everything. Every. Single. Thing! There are plenty of tangents but you won't be missing out on a single detail. So without further ado.
+And here's Part III of Analyzing an Open Source Project. [Last time](/blog/2019/07/02/analyzing-an-open-source-project-part-ii-reading-installation-script-arguments/) we started reading the install script of [libinput-gestures](https://github.com/bulletmark/libinput-gestures) ([here's](https://github.com/bulletmark/libinput-gestures/blob/master/libinput-gestures-setup#L147) the file we're looking at, click to read along), and we haven't sped up since. The goal of this blog is not to read open source projects, but to look at everything. Every. Single. Thing! There are plenty of tangents but you won't be missing out on a single detail. So without further ado.
 
 Now that we've set our cmd variable to the entered command and done our variable parsing, it's time to use our variables. While the next things to look at are functions that will be run later, we're going in execution order, so now we're going to skip to line 147 where the script really starts happening.
 
